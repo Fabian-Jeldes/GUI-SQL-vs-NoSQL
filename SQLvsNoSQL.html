@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL vs NoSQL </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&family=Fira+Code:wght@400;500&display=swap');
+        
+        :root {
+            --sql-blue: #2563eb;
+            --nosql-green: #10b981;
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; }
+        .code-font { font-family: 'Fira Code', monospace; }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeInUp 0.5s ease-out; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .sql-gradient { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); }
+        .nosql-gradient { background: linear-gradient(135deg, #065f46 0%, #10b981 100%); }
+
+        .mapping-line {
+            transition: all 0.3s ease;
+            opacity: 0.3;
+        }
+        .mapping-active {
+            opacity: 1;
+            color: #10b981;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased">
+
+    <!-- Header / Introducción -->
+    <header class="bg-slate-900 text-white py-20 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/circuit-board.png')]"></div>
+        <div class="max-w-7xl mx-auto px-6 relative z-10 text-center">
+            <div class="inline-block px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs font-bold tracking-widest mb-4 border border-blue-500/30">
+                
+            </div>
+            <h1 class="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight">
+                SQL vs NoSQL: <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400"></span>
+            </h1>
+            <p class="text-xl text-slate-400 max-w-3xl mx-auto leading-relaxed">
+                Una exploración exhaustiva desde las reglas de normalización de Codd hasta el escalamiento horizontal de la nube.
+            </p>
+        </div>
+    </header>
+
+    <!-- Menú de Navegación -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 overflow-x-auto shadow-md">
+        <div class="max-w-7xl mx-auto px-4 flex justify-center space-x-2 md:space-x-8">
+            <button onclick="showTab('historia')" id="btn-historia" class="tab-btn py-5 px-3 border-b-2 border-blue-600 text-blue-600 font-bold text-sm transition-all">1. Contexto Histórico</button>
+            <button onclick="showTab('laboratorio')" id="btn-laboratorio" class="tab-btn py-5 px-3 border-b-2 border-transparent text-slate-500 font-medium text-sm transition-all">2. Laboratorio de Transformación</button>
+            <button onclick="showTab('teoria')" id="btn-teoria" class="tab-btn py-5 px-3 border-b-2 border-transparent text-slate-500 font-medium text-sm transition-all">3. ACID vs BASE & CAP</button>
+            <button onclick="showTab('escalado')" id="btn-escalado" class="tab-btn py-5 px-3 border-b-2 border-transparent text-slate-500 font-medium text-sm transition-all">4. Escalamiento Profundo</button>
+            <button onclick="showTab('freaks')" id="btn-freaks" class="tab-btn py-5 px-3 border-b-2 border-transparent text-slate-500 font-medium text-sm transition-all">5. Datos Freak 💎</button>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-6 py-12">
+
+        <!-- SECCIÓN 1: HISTORIA DETALLADA -->
+        <section id="historia" class="tab-content active">
+            <div class="grid lg:grid-cols-2 gap-16 items-start">
+                <div class="space-y-8">
+                    <h2 class="text-4xl font-bold">El Legado de Edgar F. Codd</h2>
+                    <div class="bg-blue-50 p-6 rounded-2xl border-l-4 border-blue-600 italic text-blue-900 leading-relaxed">
+                        "En 1970, los datos estaban 'atrapados' en el hardware. Codd liberó la información al separarla de su representación física."
+                    </div>
+                    <p class="text-slate-600 leading-relaxed text-lg">
+                        <b>Edgar F. Codd</b>, un científico computacional británico trabajando para IBM, publicó el paper <i>"A Relational Model of Data for Large Shared Data Banks"</i>. Su gran innovación fue el concepto de <b>Independencia de Datos</b>: los programas no deberían saber cómo se guardan los datos físicamente para poder consultarlos.
+                    </p>
+                    <div class="space-y-4">
+                        <h4 class="font-bold text-slate-800 uppercase text-xs tracking-widest">Hitos Clave:</h4>
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold flex-shrink-0">12</div>
+                            <p class="text-sm">Codd definió las <b>12 reglas de Codd</b> (que en realidad eran 13, numeradas del 0 al 12) para definir qué hace que una base de datos sea realmente relacional.</p>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold flex-shrink-0">1981</div>
+                            <p class="text-sm">Recibe el <b>Premio Turing</b> (el "Nobel" de la informática) por sus contribuciones a la gestión de datos.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative">
+                    <div class="absolute inset-0 bg-blue-600 rounded-3xl rotate-3 opacity-10"></div>
+                    <div class="relative bg-white p-8 rounded-3xl border shadow-xl">
+                        <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12V11a1 1 0 102 0v-.615l.584.25a1 1 0 00.788 0l3-1.286a1 1 0 00.121-1.833l-3 1.286a1 1 0 01-.788 0l-3-1.286a1 1 0 01-.121-1.833l3-1.286a1 1 0 00-.788 0l-3 1.286a1 1 0 01-.121 1.833l-3 1.286a1 1 0 00.121 1.833z"></path></svg>
+                            La Trilogía de IBM
+                        </h3>
+                        <ul class="space-y-6">
+                            <li class="border-b pb-4">
+                                <span class="text-xs font-bold text-blue-600 block mb-1 uppercase">El Teórico</span>
+                                <p class="text-sm font-semibold">Edgar F. Codd</p>
+                                <p class="text-xs text-slate-500">Diseñó el modelo matemático.</p>
+                            </li>
+                            <li class="border-b pb-4">
+                                <span class="text-xs font-bold text-blue-600 block mb-1 uppercase">Los Traductores</span>
+                                <p class="text-sm font-semibold">Donald Chamberlin & Raymond Boyce</p>
+                                <p class="text-xs text-slate-500">Crearon SEQUEL para que los humanos pudieran hablar con las tablas.</p>
+                            </li>
+                            <li>
+                                <span class="text-xs font-bold text-blue-600 block mb-1 uppercase">El Implementador Silencioso</span>
+                                <p class="text-sm font-semibold">System R</p>
+                                <p class="text-xs text-slate-500">El primer prototipo real de IBM que demostró que el modelo relacional funcionaba.</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 2: LABORATORIO DE TRANSFORMACIÓN (INTERACTIVO) -->
+        <section id="laboratorio" class="tab-content">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold">Laboratorio de Transformación</h2>
+                <p class="text-slate-500 mt-2">Mapeo exacto: ¿Cómo una fila SQL se convierte en un objeto NoSQL?</p>
+            </div>
+            
+            <div class="bg-slate-900 rounded-3xl p-8 shadow-2xl overflow-hidden relative">
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <!-- Origen: SQL -->
+                    <div class="space-y-6">
+                        <div class="flex items-center gap-2 text-blue-400 font-bold text-sm uppercase tracking-widest">
+                            <div class="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div> Origen: Tabla SQL (Relacional)
+                        </div>
+                        <div class="bg-slate-800 rounded-xl border border-slate-700 p-6">
+                            <table class="w-full text-left text-xs font-mono text-slate-300">
+                                <thead>
+                                    <tr class="border-b border-slate-600">
+                                        <th class="p-3 text-blue-400">ID</th>
+                                        <th class="p-3">USUARIO</th>
+                                        <th class="p-3">BIO</th>
+                                        <th class="p-3">POST_IMG</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="hover:bg-slate-700/50 transition cursor-help" onmouseenter="highlightField('user')" onmouseleave="resetHighlight()">
+                                        <td class="p-3 text-blue-400 font-bold">1</td>
+                                        <td id="sql-user" class="p-3">@f_codd</td>
+                                        <td id="sql-bio" class="p-3 italic">"Data is math"</td>
+                                        <td id="sql-img" class="p-3">codd.png</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-tighter">Nota: En SQL, si cambiamos la BIO del usuario, se actualiza en 1 solo lugar para todos sus posts.</p>
+                    </div>
+
+                    <!-- Destino: NoSQL -->
+                    <div class="space-y-6">
+                        <div class="flex items-center gap-2 text-emerald-400 font-bold text-sm uppercase tracking-widest">
+                            <div class="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></div> Destino: Documento NoSQL (Desnormalizado)
+                        </div>
+                        <div class="bg-slate-800 rounded-xl border border-slate-700 p-6 code-font text-sm leading-relaxed">
+                            <div class="text-slate-400">{</div>
+                            <div class="pl-6 flex gap-2">
+                                <span class="text-emerald-300">"_id"</span>: <span class="text-orange-300">1</span>,
+                            </div>
+                            <div id="nosql-post" class="pl-6 flex gap-2 transition-all">
+                                <span class="text-emerald-300">"imagen"</span>: <span class="text-orange-300">"codd.png"</span>,
+                            </div>
+                            <div id="nosql-autor" class="pl-6">
+                                <span class="text-emerald-300">"autor"</span>: <span class="text-slate-400">{</span>
+                                <div class="pl-6 flex gap-2">
+                                    <span class="text-emerald-300">"nombre"</span>: <span id="nosql-val-user" class="text-orange-300">"@f_codd"</span>,
+                                </div>
+                                <div class="pl-6 flex gap-2">
+                                    <span class="text-emerald-300">"bio"</span>: <span id="nosql-val-bio" class="text-orange-300">"Data is math"</span>
+                                </div>
+                                <span class="text-slate-400">}</span>
+                            </div>
+                            <div class="text-slate-400">}</div>
+                        </div>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-tighter text-right">Nota: La información del autor está DUPLICADA en cada post para ganar velocidad de lectura.</p>
+                    </div>
+                </div>
+                
+                <!-- Overlay de Instrucción -->
+                <div class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full text-[10px] text-white/50 border border-white/10 pointer-events-none">
+                    Pasa el cursor sobre la fila SQL para ver el mapeo
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 3: TEORÍA ACID vs BASE -->
+        <section id="teoria" class="tab-content">
+            <div class="grid md:grid-cols-2 gap-12">
+                <div class="space-y-6">
+                    <h2 class="text-3xl font-bold">Consistencia Transaccional</h2>
+                    <p class="text-slate-600">En una disertación es vital explicar los dos modelos de consistencia:</p>
+                    
+                    <div class="bg-white border rounded-2xl p-6 shadow-sm">
+                        <h4 class="text-blue-600 font-bold mb-4 uppercase text-xs tracking-widest">SQL: El Rigor ACID</h4>
+                        <ul class="space-y-3 text-sm">
+                            <li><b>(A)tomicity:</b> Todo o nada. Si falla el paso 9 de 10, se deshace todo.</li>
+                            <li><b>(C)onsistency:</b> Los datos cumplen todas las reglas (FK, Not Null).</li>
+                            <li><b>(I)solation:</b> Las transacciones no se estorban entre sí.</li>
+                            <li><b>(D)urability:</b> Una vez guardado, el dato es inmortal ante fallos de energía.</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-white border rounded-2xl p-6 shadow-sm">
+                        <h4 class="text-emerald-600 font-bold mb-4 uppercase text-xs tracking-widest">NoSQL: La Flexibilidad BASE</h4>
+                        <ul class="space-y-3 text-sm">
+                            <li><b>(B)asically (A)vailable:</b> El sistema siempre responde, aunque el dato sea viejo.</li>
+                            <li><b>(S)oft State:</b> El estado del sistema puede cambiar sin entrada de datos.</li>
+                            <li><b>(E)ventual Consistency:</b> Los datos se sincronizarán... tarde o temprano.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 rounded-3xl p-10 text-white flex flex-col justify-center relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 blur-3xl rounded-full"></div>
+                    <h3 class="text-2xl font-bold mb-6">El Teorema de CAP</h3>
+                    <p class="text-slate-400 mb-8 text-sm leading-relaxed">Propuesto por <b>Eric Brewer</b>, dicta que un sistema distribuido solo puede tener 2 de 3:</p>
+                    
+                    <div class="space-y-4">
+                        <div class="group flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10 hover:bg-white/10 transition">
+                            <span class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center font-bold">C</span>
+                            <div>
+                                <h5 class="font-bold text-sm">Consistencia</h5>
+                                <p class="text-xs text-slate-500 italic">Todos ven el mismo dato al mismo tiempo.</p>
+                            </div>
+                        </div>
+                        <div class="group flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10 hover:bg-white/10 transition">
+                            <span class="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center font-bold">A</span>
+                            <div>
+                                <h5 class="font-bold text-sm">Disponibilidad</h5>
+                                <p class="text-xs text-slate-500 italic">El sistema siempre responde (aunque sea error).</p>
+                            </div>
+                        </div>
+                        <div class="group flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10 hover:bg-white/10 transition">
+                            <span class="w-10 h-10 bg-orange-600 rounded-full flex items-center justify-center font-bold">P</span>
+                            <div>
+                                <h5 class="font-bold text-sm">Tolerancia Partición</h5>
+                                <p class="text-xs text-slate-500 italic">Funciona aunque falle la red entre nodos.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-8 text-center text-[10px] font-bold text-slate-500 uppercase">
+                        SQL Clásico = C + A | NoSQL Moderno = A + P o C + P
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 4: ESCALAMIENTO PROFUNDO -->
+        <section id="escalado" class="tab-content">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold">Dinámicas de Crecimiento</h2>
+                <p class="text-slate-500">¿Cómo reacciona tu base de datos cuando el tráfico explota?</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Escalado Vertical -->
+                <div class="bg-white p-8 rounded-3xl border shadow-sm flex flex-col items-center text-center">
+                    <h3 class="text-xl font-bold mb-6 text-blue-600">Escalado Vertical (SQL)</h3>
+                    <div class="w-full max-w-xs space-y-4 mb-8">
+                        <div class="h-8 bg-blue-100 rounded border border-blue-200"></div>
+                        <div class="h-12 bg-blue-300 rounded border border-blue-400"></div>
+                        <div class="h-16 bg-blue-600 rounded border border-blue-800 shadow-lg"></div>
+                    </div>
+                    <p class="text-sm text-slate-600 leading-relaxed italic">
+                        "Comprar un camión más grande". Es más fácil de administrar pero tiene un <b>límite físico</b> (máximo de RAM/CPU en un servidor) y el costo crece exponencialmente.
+                    </p>
+                </div>
+
+                <!-- Escalado Horizontal -->
+                <div class="bg-white p-8 rounded-3xl border shadow-sm flex flex-col items-center text-center">
+                    <h3 class="text-xl font-bold mb-6 text-emerald-600">Escalado Horizontal (NoSQL)</h3>
+                    <div class="grid grid-cols-4 gap-2 w-full max-w-xs mb-8">
+                        <div class="h-10 bg-emerald-500 rounded border border-emerald-600"></div>
+                        <div class="h-10 bg-emerald-500 rounded border border-emerald-600"></div>
+                        <div class="h-10 bg-emerald-500 rounded border border-emerald-600"></div>
+                        <div class="h-10 bg-emerald-500 rounded border border-emerald-600"></div>
+                        <div class="h-10 bg-emerald-500 rounded border border-emerald-600"></div>
+                        <div class="h-10 bg-emerald-500 rounded border border-emerald-600"></div>
+                        <div class="h-10 bg-emerald-500 rounded border border-emerald-600"></div>
+                        <div class="h-10 bg-emerald-500 rounded border border-emerald-600"></div>
+                    </div>
+                    <p class="text-sm text-slate-600 leading-relaxed italic">
+                        "Contratar una flota de camionetas". Usamos <b>Sharding</b> (particionamiento). No hay límite teórico: puedes agregar miles de nodos baratos. Es la base de Google y Amazon.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 5: DATOS FREAK (Ampliados para la nota máxima) -->
+        <section id="freaks" class="tab-content">
+            <h2 class="text-3xl font-bold mb-10 text-center">Material para "Subir la Nota" 🎓</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Freak 1 -->
+                <div class="bg-white p-6 rounded-2xl border hover:border-blue-300 transition-all shadow-sm group">
+                    <div class="text-3xl mb-4 group-hover:rotate-12 transition">🐷</div>
+                    <h4 class="font-bold mb-2">El "Chanchito Feliz" de Oracle</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed italic">Larry Ellison lanzó su primer producto como <b>"Oracle v2"</b>. La v1 nunca existió. Sabía que nadie confiaría su dinero a una "v1.0" por miedo a los errores.</p>
+                </div>
+                <!-- Freak 2 -->
+                <div class="bg-white p-6 rounded-2xl border hover:border-emerald-300 transition-all shadow-sm group">
+                    <div class="text-3xl mb-4 group-hover:rotate-12 transition">⏱️</div>
+                    <h4 class="font-bold mb-2">La Regla de los 100ms</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed italic">Amazon descubrió que cada 100ms de latencia reducía las ventas en un 1%. De esa obsesión nació el paper de <b>Dynamo</b>, el abuelo de las NoSQL modernas.</p>
+                </div>
+                <!-- Freak 3 -->
+                <div class="bg-white p-6 rounded-2xl border hover:border-indigo-300 transition-all shadow-sm group">
+                    <div class="text-3xl mb-4 group-hover:rotate-12 transition">✈️</div>
+                    <h4 class="font-bold mb-2">SEQUEL vs SQL</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed italic">El nombre original era SEQUEL, pero una empresa de aviación británica ya tenía la marca. IBM quitó las vocales para evitar demandas.</p>
+                </div>
+                <!-- Freak 4 -->
+                <div class="bg-white p-6 rounded-2xl border hover:border-slate-800 transition-all shadow-sm group">
+                    <div class="text-3xl mb-4 group-hover:rotate-12 transition">🕵️</div>
+                    <h4 class="font-bold mb-2">El término NoSQL</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed italic">Fue acuñado en 1998 por <b>Carlo Strozzi</b> para su base de datos. Lo curioso es que su base de datos ERA relacional, solo que no usaba el lenguaje SQL.</p>
+                </div>
+                <!-- Freak 5 -->
+                <div class="bg-white p-6 rounded-2xl border hover:border-orange-300 transition-all shadow-sm group">
+                    <div class="text-3xl mb-4 group-hover:rotate-12 transition">📱</div>
+                    <h4 class="font-bold mb-2">El Rey Silencioso: SQLite</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed italic">Es el motor más distribuido del mundo. Está en cada celular, navegador y auto moderno. No es un servidor, es un archivo en tu memoria.</p>
+                </div>
+                <!-- Freak 6 -->
+                <div class="bg-white p-6 rounded-2xl border hover:border-yellow-400 transition-all shadow-sm group">
+                    <div class="text-3xl mb-4 group-hover:rotate-12 transition">📊</div>
+                    <h4 class="font-bold mb-2">¿SQL ha muerto?</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed italic">No. Es el 3er lenguaje más demandado. El futuro es el <b>Poliglotismo de Almacenamiento</b>: usar ambas según la parte de la App.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer de Resumen -->
+    <footer class="bg-slate-900 text-white py-16 border-t border-slate-800">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <h3 class="text-2xl font-bold mb-6">Resumen para tu Conclusión</h3>
+            <div class="grid grid-cols-2 gap-8 text-left">
+                <div class="bg-slate-800 p-6 rounded-2xl border border-blue-500/30">
+                    <h4 class="text-blue-400 font-bold text-sm mb-3 uppercase tracking-tighter">ELIGE  — SQL —  SI...</h4>
+                    <p class="text-xs text-slate-400 leading-relaxed">Necesitas integridad financiera (bancos), reportes complejos o tus datos tienen una estructura que no cambiará en años.</p>
+                </div>
+                <div class="bg-slate-800 p-6 rounded-2xl border border-emerald-500/30">
+                    <h4 class="text-emerald-400 font-bold text-sm mb-3 uppercase tracking-tighter">ELIGE — NoSQL — SI...</h4>
+                    <p class="text-xs text-slate-400 leading-relaxed">Necesitas escala masiva, velocidad extrema de lectura (Big Data), o manejas datos muy variados como logs o redes sociales.</p>
+                </div>
+            </div>
+            <p class="mt-12 text-sm text-slate-500 italic font-medium uppercase tracking-widest">
+                "No hay mejores herramientas, solo decisiones de ingeniería adecuadas."
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('text-blue-600', 'border-blue-600', 'font-bold');
+                btn.classList.add('text-slate-500', 'border-transparent', 'font-medium');
+            });
+
+            document.getElementById(tabId).classList.add('active');
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.remove('text-slate-500', 'border-transparent', 'font-medium');
+            activeBtn.classList.add('text-blue-600', 'border-blue-600', 'font-bold');
+            
+            window.scrollTo({ top: 350, behavior: 'smooth' });
+        }
+
+        function highlightField(type) {
+            const nosqlValUser = document.getElementById('nosql-val-user');
+            const nosqlValBio = document.getElementById('nosql-val-bio');
+            const sqlUser = document.getElementById('sql-user');
+            const sqlBio = document.getElementById('sql-bio');
+            const sqlImg = document.getElementById('sql-img');
+            const nosqlPost = document.getElementById('nosql-post');
+            const nosqlAutor = document.getElementById('nosql-autor');
+
+            // Apply styles
+            [nosqlValUser, nosqlValBio, sqlUser, sqlBio, sqlImg, nosqlPost, nosqlAutor].forEach(el => {
+                el.classList.add('mapping-active');
+                el.classList.add('text-emerald-400');
+            });
+        }
+
+        function resetHighlight() {
+            const elements = ['nosql-val-user', 'nosql-val-bio', 'sql-user', 'sql-bio', 'sql-img', 'nosql-post', 'nosql-autor'];
+            elements.forEach(id => {
+                const el = document.getElementById(id);
+                el.classList.remove('mapping-active');
+                el.classList.remove('text-emerald-400');
+            });
+        }
+    </script>
+</body>
+</html>
